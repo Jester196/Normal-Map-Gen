@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normal Map Generator - Offline</title>
+    
+    <!-- Tailwind CSS CDN with fallback -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Fallback if Tailwind CDN fails
+        if (typeof tailwind === 'undefined') {
+            document.head.insertAdjacentHTML('beforeend', `
+                <style>
+                    /* Basic Tailwind-like styles */
+                    * { box-sizing: border-box; }
+                    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+                    .min-h-screen { min-height: 100vh; }
+                    .bg-gray-800 { background-color: #1f2937; }
+                    .bg-gray-900 { background-color: #111827; }
+                    .bg-gray-700 { background-color: #374151; }
+                    .bg-gray-600 { background-color: #4b5563; }
+                    .bg-blue-600 { background-color: #2563eb; }
+                    .bg-green-600 { background-color: #16a34a; }
+                    .text-white { color: #ffffff; }
+                    .text-gray-100 { color: #f3f4f6; }
+                    .text-gray-300 { color: #d1d5db; }
+                    .text-gray-400 { color: #9ca3af; }
+                    .text-gray-500 { color: #6b7280; }
+                    .border-gray-600 { border-color: #4b5563; }
+                    .border-gray-700 { border-color: #374151; }
+                    .border-blue-500 { border-color: #3b82f6; }
+                    .rounded-xl { border-radius: 0.75rem; }
+                    .rounded-2xl { border-radius: 1rem; }
+                    .rounded-lg { border-radius: 0.5rem; }
+                    .rounded-md { border-radius: 0.375rem; }
+                    .rounded-full { border-radius: 9999px; }
+                    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+                    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+                    .p-4 { padding: 1rem; }
+                    .p-6 { padding: 1.5rem; }
+                    .p-3 { padding: 0.75rem; }
+                    .p-2.5 { padding: 0.625rem; }
+                    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+                    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+                    .mb-4 { margin-bottom: 1rem; }
+                    .mb-6 { margin-bottom: 1.5rem; }
+                    .mb-3 { margin-bottom: 0.75rem; }
+                    .mb-1 { margin-bottom: 0.25rem; }
+                    .mt-1 { margin-top: 0.25rem; }
+                    .mt-6 { margin-top: 1.5rem; }
+                    .w-full { width: 100%; }
+                    .w-5 { width: 1.25rem; }
+                    .w-6 { width: 1.5rem; }
+                    .w-14 { width: 3.5rem; }
+                    .w-80 { width: 20rem; }
+                    .w-96 { width: 24rem; }
+                    .h-2 { height: 0.5rem; }
+                    .h-5 { height: 1.25rem; }
+                    .h-6 { height: 1.5rem; }
+                    .h-8 { height: 2rem; }
+                    .max-w-7xl { max-width: 80rem; }
+                    .flex { display: flex; }
+                    .flex-col { flex-direction: column; }
+                    .flex-shrink-0 { flex-shrink: 0; }
+                    .flex-grow { flex-grow: 1; }
+                    .items-center { align-items: center; }
+                    .justify-center { justify-content: center; }
+                    .justify-between { justify-content: space-between; }
+                    .text-center { text-align: center; }
+                    .mx-auto { margin-left: auto; margin-right: auto; }
+                    .gap-2 { gap: 0.5rem; }
+                    .gap-6 { gap: 1.5rem; }
+                    .space-y-4 > * + * { margin-top: 1rem; }
+                    .grid { display: grid; }
+                    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                    .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+                    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+                    .font-bold { font-weight: 700; }
+                    .font-medium { font-weight: 500; }
+                    .font-semibold { font-weight: 600; }
+                    .tracking-tight { letter-spacing: -0.025em; }
+                    .tracking-wider { letter-spacing: 0.05em; }
+                    .uppercase { text-transform: uppercase; }
+                    .text-transparent { color: transparent; }
+                    .bg-clip-text { background-clip: text; }
+                    .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+                    .from-purple-400 { --tw-gradient-from: #a78bfa; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(167, 139, 250, 0)); }
+                    .to-blue-500 { --tw-gradient-to: #3b82f6; }
+                    .cursor-crosshair { cursor: crosshair; }
+                    .cursor-cell { cursor: cell; }
+                    .cursor-pointer { cursor: pointer; }
+                    .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+                    .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+                    .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+                    .hover\\:bg-gray-600:hover { background-color: #4b5563; }
+                    .hover\\:bg-gray-700:hover { background-color: #374151; }
+                    .hover\\:bg-green-700:hover { background-color: #15803d; }
+                    .focus\\:ring-blue-500:focus { --tw-ring-color: #3b82f6; }
+                    .focus\\:border-blue-500:focus { border-color: #3b82f6; }
+                    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+                    .relative { position: relative; }
+                    .absolute { position: absolute; }
+                    .left-1 { left: 0.25rem; }
+                    .top-1 { top: 0.25rem; }
+                    .block { display: block; }
+                    .border-2 { border-width: 2px; }
+                    .border { border-width: 1px; }
+                    .appearance-none { appearance: none; }
+                    .range-lg::-webkit-slider-thumb { appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer; }
+                    .range-lg::-moz-range-thumb { height: 20px; width: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: none; }
+                    .translate-x-6 { transform: translateX(1.5rem); }
+                    .backdrop-blur-sm { backdrop-filter: blur(4px); }
+                    .selection\\:bg-blue-500\\/30 ::selection { background-color: rgba(59, 130, 246, 0.3); }
+                    @media (min-width: 768px) {
+                        .md\\:flex-row { flex-direction: row; }
+                        .md\\:w-80 { width: 20rem; }
+                    }
+                    @media (min-width: 1024px) {
+                        .lg\\:w-96 { width: 24rem; }
+                    }
+                </style>
+            `);
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <div id="root"></div>
+
+    <!-- React and ReactDOM from CDN with fallback -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel standalone for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script type="text/babel">
+        // Check if React is loaded
+        if (typeof React === 'undefined') {
+            console.error('React not loaded');
+            document.body.innerHTML = '<div style="color: red; padding: 20px;">Error: React not loaded</div>';
+        } else {
+            console.log('React loaded successfully');
+        }
+
+        const { useState, useRef, useCallback, useEffect } = React;
+
+        // Types and Enums
+        const Tool = {
+            Box: 'BOX',
+            Brush: 'BRUSH',
+            Polygon: 'POLYGON',
+        };
+
+        const BevelStyle = {
+            None: 'NONE',
+            Soft: 'SOFT',
+            Hard: 'HARD',
+        };
+
+        const SelectionMode = {
+            Contract: 'CONTRACT',
+            Expand: 'EXPAND',
+        };
+
+        // Icons
+        const BoxIcon = ({ className }) => (
+            React.createElement('svg', {
+                xmlns: "http://www.w3.org/2000/svg",
+                className: className,
+                fill: "none",
+                viewBox: "0 0 24 24",
+                stroke: "currentColor",
+                strokeWidth: 2
+            }, React.createElement('path', {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                d: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            }))
+        );
+
+        const BrushIcon = ({ className }) => (
+            React.createElement('svg', {
+                xmlns: "http://www.w3.org/2000/svg",
+                className: className,
+                fill: "none",
+                viewBox: "0 0 24 24",
+                stroke: "currentColor",
+                strokeWidth: 2
+            }, React.createElement('path', {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                d: "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"
+            }))
+        );
+
+        const PolygonIcon = ({ className }) => (
+            React.createElement('svg', {
+                xmlns: "http://www.w3.org/2000/svg",
+                className: className,
+                fill: "none",
+                viewBox: "0 0 24 24",
+                stroke: "currentColor",
+                strokeWidth: 2
+            }, React.createElement('path', {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                d: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            }))
+        );
+
+        // Normal Map Generator Hook
+        const useNormalMapGenerator = (width, height) => {
+            const [settings, setSettings] = useState({
+                tool: Tool.Box,
+                invert: false,
+                invertR: false,
+                invertG: false,
+                bevelStyle: BevelStyle.Hard,
+                bevelStrength: 8,
+                brushSize: 20,
+                depth: 1.0,
+                selectionMode: SelectionMode.Contract,
+                smooth: 1,
+                feather: 1,
+                border: 0,
+                resolution: 512,
+                tileX2: false,
+                tileX4: false,
+            });
+
+            const canvasRef = useRef(null);
+            const [normalMapData, setNormalMapData] = useState(null);
+            const heightMap = useRef(new Float32Array(width * height));
+            const isDrawing = useRef(false);
+            const startPos = useRef({ x: 0, y: 0 });
+            const lastPos = useRef({ x: 0, y: 0 });
+            const polygonPoints = useRef([]);
+            const isPolygonMode = useRef(false);
+            const [showPreview, setShowPreview] = useState(false);
+            const [polygonPointsState, setPolygonPointsState] = useState([]);
+            const [boxPreview, setBoxPreview] = useState(null);
+            
+            const generateNormalMap = useCallback(() => {
+                const tempHeightMap = new Float32Array(heightMap.current);
+
+                // Apply Bevel
+                if (settings.bevelStyle !== BevelStyle.None && settings.bevelStrength > 0) {
+                    const processedHeightMap = new Float32Array(tempHeightMap.length);
+                    const strength = settings.bevelStrength;
+
+                    if (settings.bevelStyle === BevelStyle.Soft) { // Gaussian blur
+                        const blur = (src, dst, horizontal) => {
+                            for (let y = 0; y < height; y++) {
+                                for (let x = 0; x < width; x++) {
+                                    let total = 0;
+                                    let weightSum = 0;
+                                    for (let i = -strength; i <= strength; i++) {
+                                        const sampleX = horizontal ? x + i : x;
+                                        const sampleY = horizontal ? y : y + i;
+
+                                        if (sampleX >= 0 && sampleX < width && sampleY >= 0 && sampleY < height) {
+                                            const weight = Math.exp(-(i * i) / (2 * strength * strength));
+                                            total += src[sampleY * width + sampleX] * weight;
+                                            weightSum += weight;
+                                        }
+                                    }
+                                    dst[y * width + x] = total / weightSum;
+                                }
+                            }
+                        };
+                        const intermediate = new Float32Array(tempHeightMap.length);
+                        blur(tempHeightMap, intermediate, true);
+                        blur(intermediate, processedHeightMap, false);
+                        tempHeightMap.set(processedHeightMap);
+
+                    } else if (settings.bevelStyle === BevelStyle.Hard) { // Linear falloff
+                        const originalHeightMap = new Float32Array(heightMap.current);
+                        for (let y = 0; y < height; y++) {
+                            for (let x = 0; x < width; x++) {
+                                const currentHeight = originalHeightMap[y * width + x];
+                                if (currentHeight > 0.5 && currentHeight < 1.0) continue; 
+                                let minDst = strength;
+                                
+                                for(let j = -strength; j <= strength; j++) {
+                                    for(let i = -strength; i <= strength; i++) {
+                                        const nx = x + i;
+                                        const ny = y + j;
+                                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                            const neighborHeight = originalHeightMap[ny * width + nx];
+                                            if (neighborHeight !== currentHeight) {
+                                                const dist = Math.sqrt(i*i + j*j);
+                                                if (dist < minDst) {
+                                                    minDst = dist;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                const bevelAmount = 1.0 - Math.min(minDst / strength, 1.0);
+                                if (currentHeight === 1.0) { // Raised
+                                    processedHeightMap[y * width + x] = 0.5 + 0.5 * bevelAmount;
+                                } else { // Carved
+                                    processedHeightMap[y * width + x] = 0.5 - 0.5 * bevelAmount;
+                                }
+                            }
+                        }
+                        tempHeightMap.set(processedHeightMap);
+                    }
+                }
+
+                const imageData = new ImageData(width, height);
+                const data = imageData.data;
+                const strength = 1.0;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const hL = tempHeightMap[y * width + Math.max(0, x - 1)];
+                        const hR = tempHeightMap[y * width + Math.min(width - 1, x + 1)];
+                        const hU = tempHeightMap[Math.max(0, y - 1) * width + x];
+                        const hD = tempHeightMap[Math.min(height - 1, y + 1) * width + x];
+
+                        let n = { x: (hL - hR) * strength, y: (hD - hU) * strength, z: 1.0 };
+                        const len = Math.sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+                        n = { x: n.x / len, y: n.y / len, z: n.z / len };
+
+                        let r = (n.x + 1) * 0.5;
+                        let g = (n.y + 1) * 0.5;
+                        
+                        if (settings.invertG !== settings.invert) g = 1.0 - g;
+                        if (settings.invertR) r = 1.0 - r;
+
+                        const i = (y * width + x) * 4;
+                        data[i] = r * 255;
+                        data[i + 1] = g * 255;
+                        data[i + 2] = (n.z + 1) * 0.5 * 255;
+                        data[i + 3] = 255;
+                    }
+                }
+                setNormalMapData(imageData);
+            }, [width, height, settings]);
+
+            useEffect(() => {
+                heightMap.current.fill(0.5);
+                generateNormalMap();
+            }, []);
+
+            useEffect(() => {
+                generateNormalMap();
+            }, [settings, generateNormalMap]);
+
+            const updateHeightMap = (updateFn) => {
+                updateFn();
+                generateNormalMap();
+            };
+            
+            const drawLine = (x0, y0, x1, y1) => {
+                const dx = Math.abs(x1 - x0);
+                const dy = Math.abs(y1 - y0);
+                const sx = (x0 < x1) ? 1 : -1;
+                const sy = (y0 < y1) ? 1 : -1;
+                let err = dx - dy;
+
+                while(true) {
+                    drawBrush(x0, y0);
+                    if ((x0 === x1) && (y0 === y1)) break;
+                    const e2 = 2 * err;
+                    if (e2 > -dy) { err -= dy; x0 += sx; }
+                    if (e2 < dx) { err += dx; y0 += sy; }
+                }
+            };
+
+            const drawBrush = (cx, cy) => {
+                const radius = settings.brushSize;
+                const val = settings.invert ? 0.5 - settings.depth * 0.5 : 0.5 + settings.depth * 0.5;
+                for (let y = -radius; y <= radius; y++) {
+                    for (let x = -radius; x <= radius; x++) {
+                        if (x * x + y * y <= radius * radius) {
+                            const px = cx + x;
+                            const py = cy + y;
+                            if (px >= 0 && px < width && py >= 0 && py < height) {
+                                heightMap.current[py * width + px] = val;
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Point-in-polygon test
+            const pointInPolygon = (x, y, points) => {
+                let inside = false;
+                for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+                    if (((points[i].y > y) !== (points[j].y > y)) &&
+                        (x < (points[j].x - points[i].x) * (y - points[i].y) / (points[j].y - points[i].y) + points[i].x)) {
+                        inside = !inside;
+                    }
+                }
+                return inside;
+            };
+
+            const fillPolygon = (points) => {
+                if (points.length < 3) return;
+                
+                const val = settings.invert ? 0.5 - settings.depth * 0.5 : 0.5 + settings.depth * 0.5;
+                
+                // Find bounding box
+                let minX = Math.min(...points.map(p => p.x));
+                let maxX = Math.max(...points.map(p => p.x));
+                let minY = Math.min(...points.map(p => p.y));
+                let maxY = Math.max(...points.map(p => p.y));
+                
+                // Clamp to canvas bounds
+                minX = Math.max(0, minX);
+                maxX = Math.min(width - 1, maxX);
+                minY = Math.max(0, minY);
+                maxY = Math.min(height - 1, maxY);
+                
+                // Fill polygon
+                for (let y = minY; y <= maxY; y++) {
+                    for (let x = minX; x <= maxX; x++) {
+                        if (pointInPolygon(x, y, points)) {
+                            heightMap.current[y * width + x] = val;
+                        }
+                    }
+                }
+            };
+
+            const handleMouseDown = (e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = Math.floor(e.clientX - rect.left);
+                const y = Math.floor(e.clientY - rect.top);
+                
+                if (settings.tool === Tool.Polygon) {
+                    if (!isPolygonMode.current) {
+                        // Start new polygon
+                        isPolygonMode.current = true;
+                        const newPoints = [{ x, y }];
+                        polygonPoints.current = newPoints;
+                        setPolygonPointsState(newPoints);
+                        setShowPreview(true);
+                    } else {
+                        // Add point to polygon
+                        const newPoints = [...polygonPoints.current, { x, y }];
+                        polygonPoints.current = newPoints;
+                        setPolygonPointsState(newPoints);
+                    }
+                    return;
+                }
+                
+                isDrawing.current = true;
+                startPos.current = { x, y };
+                lastPos.current = {x, y};
+                setShowPreview(true);
+                
+                if (settings.tool === Tool.Brush) {
+                    updateHeightMap(() => drawBrush(x,y));
+                }
+            };
+
+            const handleMouseMove = (e) => {
+                if (!isDrawing.current) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = Math.floor(e.clientX - rect.left);
+                const y = Math.floor(e.clientY - rect.top);
+
+                if (settings.tool === Tool.Brush) {
+                    updateHeightMap(() => drawLine(lastPos.current.x, lastPos.current.y, x, y));
+                    lastPos.current = {x, y};
+                } else if (settings.tool === Tool.Box) {
+                    // Update box preview
+                    const x0 = Math.min(startPos.current.x, x);
+                    const y0 = Math.min(startPos.current.y, y);
+                    const x1 = Math.max(startPos.current.x, x);
+                    const y1 = Math.max(startPos.current.y, y);
+                    setBoxPreview({ x0, y0, x1, y1 });
+                }
+            };
+            
+            const handleMouseUp = (e) => {
+                if (settings.tool === Tool.Polygon) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = Math.floor(e.clientX - rect.left);
+                    const y = Math.floor(e.clientY - rect.top);
+                    
+                    // Check if clicking near first point to close polygon
+                    if (polygonPoints.current.length >= 3) {
+                        const firstPoint = polygonPoints.current[0];
+                        const distance = Math.sqrt((x - firstPoint.x) ** 2 + (y - firstPoint.y) ** 2);
+                        if (distance < 10) {
+                            // Close polygon
+                            updateHeightMap(() => fillPolygon(polygonPoints.current));
+                            isPolygonMode.current = false;
+                            polygonPoints.current = [];
+                            setPolygonPointsState([]);
+                            setShowPreview(false);
+                            return;
+                        }
+                    }
+                    return;
+                }
+                
+                if (!isDrawing.current) return;
+                isDrawing.current = false;
+                setShowPreview(false);
+                setBoxPreview(null);
+                
+                const rect = e.currentTarget.getBoundingClientRect();
+                const endX = Math.floor(e.clientX - rect.left);
+                const endY = Math.floor(e.clientY - rect.top);
+
+                if (settings.tool === Tool.Box) {
+                    updateHeightMap(() => {
+                        const x0 = Math.min(startPos.current.x, endX);
+                        const y0 = Math.min(startPos.current.y, endY);
+                        const x1 = Math.max(startPos.current.x, endX);
+                        const y1 = Math.max(startPos.current.y, endY);
+                        const val = settings.invert ? 0.5 - settings.depth * 0.5 : 0.5 + settings.depth * 0.5;
+                        for (let y = y0; y < y1; y++) {
+                            for (let x = x0; x < x1; x++) {
+                                heightMap.current[y * width + x] = val;
+                            }
+                        }
+                    });
+                }
+            };
+
+            const handleMouseLeave = () => {
+                if (settings.tool === Tool.Polygon) {
+                    return;
+                }
+                
+                if(isDrawing.current) {
+                    if(settings.tool === Tool.Box) {
+                        handleMouseUp({});
+                    } else {
+                        isDrawing.current = false;
+                        setShowPreview(false);
+                        setBoxPreview(null);
+                    }
+                }
+            };
+
+            const clear = () => {
+                updateHeightMap(() => {
+                    heightMap.current.fill(0.5);
+                });
+                isPolygonMode.current = false;
+                polygonPoints.current = [];
+                setPolygonPointsState([]);
+                setShowPreview(false);
+                setBoxPreview(null);
+            };
+
+            const download = () => {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                    const link = document.createElement('a');
+                    link.download = 'normal_map.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }
+            };
+
+            return {
+                settings,
+                setSettings,
+                normalMapData,
+                canvasRef,
+                handleMouseDown,
+                handleMouseMove,
+                handleMouseUp,
+                handleMouseLeave,
+                clear,
+                download,
+                polygonPoints: polygonPointsState,
+                isPolygonMode: isPolygonMode.current,
+                showPreview,
+                boxPreview,
+            };
+        };
+
+        // Normal Map Canvas Component
+        const NormalMapCanvas = ({
+            width,
+            height,
+            normalMapData,
+            canvasRef,
+            onMouseDown,
+            onMouseMove,
+            onMouseUp,
+            onMouseLeave,
+            tool,
+            polygonPoints,
+            isPolygonMode,
+            showPreview,
+            boxPreview,
+        }) => {
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (canvas && normalMapData) {
+                    const ctx = canvas.getContext('2d');
+                    if (ctx) {
+                        ctx.putImageData(normalMapData, 0, 0);
+                        
+                        // Draw polygon preview
+                        if (isPolygonMode && polygonPoints.length > 0) {
+                            // Draw connecting lines between all points
+                            ctx.strokeStyle = '#f63b54';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([5, 5]);
+                            
+                            if (polygonPoints.length > 1) {
+                                ctx.beginPath();
+                                ctx.moveTo(polygonPoints[0].x, polygonPoints[0].y);
+                                for (let i = 1; i < polygonPoints.length; i++) {
+                                    ctx.lineTo(polygonPoints[i].x, polygonPoints[i].y);
+                                }
+                                ctx.stroke();
+                            }
+                            
+                            // Draw points (all points, not just the first)
+                            ctx.fillStyle = '#f63b54';
+                            ctx.setLineDash([]);
+                            for (let i = 0; i < polygonPoints.length; i++) {
+                                ctx.beginPath();
+                                ctx.arc(polygonPoints[i].x, polygonPoints[i].y, 4, 0, 2 * Math.PI);
+                                ctx.fill();
+                                
+                                // Add white border to points for better visibility
+                                ctx.strokeStyle = '#ffffff';
+                                ctx.lineWidth = 1;
+                                ctx.stroke();
+                            }
+                            
+                            // Draw line to first point if there are enough points (closing line)
+                            if (polygonPoints.length >= 3) {
+                                ctx.strokeStyle = '#10b981';
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([3, 3]);
+                                ctx.beginPath();
+                                ctx.moveTo(polygonPoints[polygonPoints.length - 1].x, polygonPoints[polygonPoints.length - 1].y);
+                                ctx.lineTo(polygonPoints[0].x, polygonPoints[0].y);
+                                ctx.stroke();
+                            }
+                        }
+                        
+                        // Draw box preview
+                        if (boxPreview) {
+                            ctx.strokeStyle = '#f63b54';
+                            ctx.lineWidth = 2;
+                            ctx.setLineDash([5, 5]);
+                            ctx.strokeRect(boxPreview.x0, boxPreview.y0, boxPreview.x1 - boxPreview.x0, boxPreview.y1 - boxPreview.y0);
+                        }
+                    }
+                }
+            }, [normalMapData, canvasRef, polygonPoints, isPolygonMode, boxPreview]);
+
+            const cursorClass = tool === Tool.Box ? 'cursor-crosshair' : 
+                               tool === Tool.Polygon ? 'cursor-crosshair' : 'cursor-cell';
+
+            return React.createElement('canvas', {
+                ref: canvasRef,
+                width: width,
+                height: height,
+                onMouseDown: onMouseDown,
+                onMouseMove: onMouseMove,
+                onMouseUp: onMouseUp,
+                onMouseLeave: onMouseLeave,
+                className: `bg-gray-700 rounded-xl shadow-lg border-2 ${showPreview ? 'border-blue-500' : 'border-gray-600'} ${cursorClass}`
+            });
+        };
+
+        // Controls Panel Component
+        const ControlSection = ({ title, children }) => React.createElement('div', { className: "mb-6" },
+            React.createElement('h3', { className: "text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3" }, title),
+            React.createElement('div', { className: "space-y-4" }, children)
+        );
+
+        const Toggle = ({ label, checked, onChange }) => React.createElement('label', { className: "flex items-center justify-between cursor-pointer" },
+            React.createElement('span', { className: "text-gray-300" }, label),
+            React.createElement('div', { className: "relative" },
+                React.createElement('input', {
+                    type: "checkbox",
+                    className: "sr-only",
+                    checked: checked,
+                    onChange: (e) => onChange(e.target.checked)
+                }),
+                React.createElement('div', {
+                    className: `block w-14 h-8 rounded-full transition-colors ${checked ? 'bg-blue-600' : 'bg-gray-600'}`
+                }),
+                React.createElement('div', {
+                    className: `dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${checked ? 'translate-x-6' : ''}`
+                })
+            )
+        );
+
+        const ControlsPanel = ({ settings, setSettings, onClear, onDownload }) => {
+            const updateSetting = (key, value) => {
+                setSettings(prev => ({ ...prev, [key]: value }));
+            };
+
+            return React.createElement('div', { className: "bg-gray-900/50 backdrop-blur-sm p-6 rounded-2xl border border-gray-700 shadow-2xl h-full" },
+                React.createElement(ControlSection, { title: "Tools" },
+                    React.createElement('div', { className: "grid grid-cols-3 gap-2" },
+                        React.createElement('button', {
+                            onClick: () => updateSetting('tool', Tool.Box),
+                            className: `flex items-center justify-center gap-2 p-3 rounded-md transition-all text-sm font-medium border-2 ${settings.tool === Tool.Box ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'}`
+                        },
+                            React.createElement(BoxIcon, { className: "w-5 h-5" }),
+                            "Box"
+                        ),
+                        React.createElement('button', {
+                            onClick: () => updateSetting('tool', Tool.Brush),
+                            className: `flex items-center justify-center gap-2 p-3 rounded-md transition-all text-sm font-medium border-2 ${settings.tool === Tool.Brush ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'}`
+                        },
+                            React.createElement(BrushIcon, { className: "w-5 h-5" }),
+                            "Brush"
+                        ),
+                        React.createElement('button', {
+                            onClick: () => updateSetting('tool', Tool.Polygon),
+                            className: `flex items-center justify-center gap-2 p-3 rounded-md transition-all text-sm font-medium border-2 ${settings.tool === Tool.Polygon ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'}`
+                        },
+                            React.createElement(PolygonIcon, { className: "w-5 h-5" }),
+                            "Polygon"
+                        )
+                    ),
+                    settings.tool === Tool.Brush && React.createElement('div', null,
+                        React.createElement('label', { htmlFor: "brushSize", className: "flex justify-between text-sm text-gray-300 mb-1" },
+                            React.createElement('span', null, "Brush Size"),
+                            React.createElement('span', null, settings.brushSize)
+                        ),
+                        React.createElement('input', {
+                            type: "range",
+                            id: "brushSize",
+                            min: "1",
+                            max: "100",
+                            value: settings.brushSize,
+                            onChange: (e) => updateSetting('brushSize', parseInt(e.target.value, 10)),
+                            className: "w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg"
+                        })
+                    ),
+                    settings.tool === Tool.Polygon && React.createElement('div', { className: "text-sm text-gray-400 p-3 bg-gray-800 rounded-lg" },
+                        "Click to add points. Click near the first point to close the polygon."
+                    )
+                ),
+                React.createElement(ControlSection, { title: "Normal map" },
+                    React.createElement('div', { className: "space-y-4" },
+                        // Bevels subsection
+                        React.createElement('div', null,
+                            React.createElement('h4', { className: "text-xs font-medium text-gray-400 mb-2" }, "Bevels"),
+                            React.createElement('div', { className: "flex gap-2 mb-3" },
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('bevelStyle', BevelStyle.Hard),
+                                    className: `px-3 py-1 rounded-full text-xs font-medium transition-colors ${settings.bevelStyle === BevelStyle.Hard ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Hard"),
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('bevelStyle', BevelStyle.Soft),
+                                    className: `px-3 py-1 rounded-full text-xs font-medium transition-colors ${settings.bevelStyle === BevelStyle.Soft ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Soft")
+                            ),
+                            React.createElement('div', { className: "grid grid-cols-3 gap-1" },
+                                [2, 4, 8, 16, 32, 64].map(value => 
+                                    React.createElement('button', {
+                                        key: value,
+                                        onClick: () => updateSetting('bevelStrength', value),
+                                        className: `px-2 py-1 text-xs rounded transition-colors ${settings.bevelStrength === value ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                    }, value.toString())
+                                )
+                            )
+                        ),
+                        // Normals subsection
+                        React.createElement('div', null,
+                            React.createElement('h4', { className: "text-xs font-medium text-gray-400 mb-2" }, "Normals"),
+                            React.createElement('div', { className: "space-y-1" },
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('invert', false),
+                                    className: `w-full text-left px-2 py-1 text-xs rounded transition-colors ${!settings.invert ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Overlay normal"),
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('invert', true),
+                                    className: `w-full text-left px-2 py-1 text-xs rounded transition-colors ${settings.invert ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Invert normal"),
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('invertG', !settings.invertG),
+                                    className: `w-full text-left px-2 py-1 text-xs rounded transition-colors ${settings.invertG ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Flip Green"),
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('invertR', !settings.invertR),
+                                    className: `w-full text-left px-2 py-1 text-xs rounded transition-colors ${settings.invertR ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Flip Red")
+                            )
+                        )
+                    )
+                ),
+                React.createElement(ControlSection, { title: "Selection" },
+                    React.createElement('div', { className: "space-y-4" },
+                        // Selection mode subsection
+                        React.createElement('div', null,
+                            React.createElement('h4', { className: "text-xs font-medium text-gray-400 mb-2" }, "Selection mode"),
+                            React.createElement('div', { className: "flex gap-2 mb-3" },
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('selectionMode', SelectionMode.Contract),
+                                    className: `px-3 py-1 rounded-full text-xs font-medium transition-colors ${settings.selectionMode === SelectionMode.Contract ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Contract"),
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('selectionMode', SelectionMode.Expand),
+                                    className: `px-3 py-1 rounded-full text-xs font-medium transition-colors ${settings.selectionMode === SelectionMode.Expand ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Expand")
+                            ),
+                            React.createElement('div', { className: "flex justify-between text-xs text-gray-400 mb-1" },
+                                React.createElement('span', null, "Smooth"),
+                                React.createElement('span', null, "Feather")
+                            ),
+                            React.createElement('div', { className: "grid grid-cols-2 gap-2 mb-3" },
+                                React.createElement('div', null,
+                                    React.createElement('input', {
+                                        type: "range",
+                                        min: "1",
+                                        max: "20",
+                                        value: settings.smooth,
+                                        onChange: (e) => updateSetting('smooth', parseInt(e.target.value)),
+                                        className: "w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                    })
+                                ),
+                                React.createElement('div', null,
+                                    React.createElement('input', {
+                                        type: "range",
+                                        min: "1",
+                                        max: "20",
+                                        value: settings.feather,
+                                        onChange: (e) => updateSetting('feather', parseInt(e.target.value)),
+                                        className: "w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                    })
+                                )
+                            ),
+                            React.createElement('div', { className: "grid grid-cols-4 gap-1" },
+                                [1, 5, 10, 20].map(value => 
+                                    React.createElement('button', {
+                                        key: value,
+                                        onClick: () => updateSetting('smooth', value),
+                                        className: `px-2 py-1 text-xs rounded transition-colors ${settings.smooth === value ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                    }, value.toString())
+                                )
+                            ),
+                            React.createElement('div', { className: "mt-2" },
+                                React.createElement('label', { className: "text-xs text-gray-400" }, "Border")
+                            )
+                        )
+                    )
+                ),
+                React.createElement(ControlSection, { title: "Image" },
+                    React.createElement('div', { className: "space-y-4" },
+                        // Resolutions subsection
+                        React.createElement('div', null,
+                            React.createElement('h4', { className: "text-xs font-medium text-gray-400 mb-2" }, "Resolutions"),
+                            React.createElement('div', { className: "grid grid-cols-3 gap-1" },
+                                [64, 128, 256, 512, 1024, 2048].map(value => 
+                                    React.createElement('button', {
+                                        key: value,
+                                        onClick: () => updateSetting('resolution', value),
+                                        className: `px-2 py-1 text-xs rounded transition-colors ${settings.resolution === value ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                    }, value.toString())
+                                )
+                            )
+                        ),
+                        // Tiling subsection
+                        React.createElement('div', null,
+                            React.createElement('h4', { className: "text-xs font-medium text-gray-400 mb-2" }, "Tiling"),
+                            React.createElement('div', { className: "flex gap-2" },
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('tileX2', !settings.tileX2),
+                                    className: `px-3 py-1 rounded-full text-xs font-medium transition-colors ${settings.tileX2 ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Tile x2"),
+                                React.createElement('button', {
+                                    onClick: () => updateSetting('tileX4', !settings.tileX4),
+                                    className: `px-3 py-1 rounded-full text-xs font-medium transition-colors ${settings.tileX4 ? 'bg-gray-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`
+                                }, "Tile x4")
+                            )
+                        )
+                    )
+                ),
+                React.createElement(ControlSection, { title: "Actions" },
+                    React.createElement('div', { className: "grid grid-cols-2 gap-2" },
+                        React.createElement('button', {
+                            onClick: onClear,
+                            className: "w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                        }, "Clear"),
+                        React.createElement('button', {
+                            onClick: onDownload,
+                            className: "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                        }, "Download")
+                    )
+                )
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const CANVAS_SIZE = 512; // Default size
+            const {
+                settings,
+                setSettings,
+                normalMapData,
+                canvasRef,
+                handleMouseDown,
+                handleMouseMove,
+                handleMouseUp,
+                handleMouseLeave,
+                clear,
+                download,
+                polygonPoints,
+                isPolygonMode,
+                showPreview,
+                boxPreview,
+            } = useNormalMapGenerator(CANVAS_SIZE, CANVAS_SIZE);
+
+            return React.createElement('div', { className: "min-h-screen bg-gray-800 text-white flex flex-col items-center justify-center p-4 selection:bg-blue-500/30" },
+                React.createElement('header', { className: "w-full max-w-7xl mx-auto text-center mb-4" },
+                    React.createElement('h1', { className: "text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500" },
+                        "Normal Map Generator"
+                    ),
+                    React.createElement('p', { className: "text-gray-400 mt-1" },
+                        "Create normal maps in real-time with intuitive tools."
+                    )
+                ),
+                React.createElement('main', { className: "w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-6" },
+                    React.createElement('aside', { className: "w-full md:w-80 lg:w-96 flex-shrink-0" },
+                        React.createElement(ControlsPanel, {
+                            settings: settings,
+                            setSettings: setSettings,
+                            onClear: clear,
+                            onDownload: download
+                        })
+                    ),
+                    React.createElement('section', { className: "flex-grow flex items-center justify-center" },
+                        React.createElement(NormalMapCanvas, {
+                            width: CANVAS_SIZE,
+                            height: CANVAS_SIZE,
+                            normalMapData: normalMapData,
+                            canvasRef: canvasRef,
+                            onMouseDown: handleMouseDown,
+                            onMouseMove: handleMouseMove,
+                            onMouseUp: handleMouseUp,
+                            onMouseLeave: handleMouseLeave,
+                            tool: settings.tool,
+                            polygonPoints: polygonPoints,
+                            isPolygonMode: isPolygonMode,
+                            showPreview: showPreview,
+                            boxPreview: boxPreview
+                        })
+                    )
+                ),
+                React.createElement('footer', { className: "w-full max-w-7xl mx-auto text-center mt-6 text-gray-500 text-sm" },
+                    React.createElement('p', null, "Built by a world-class senior frontend React engineer.")
+                )
+            );
+        };
+
+        // Render the app
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+            console.log('Root element found, rendering...');
+            const root = ReactDOM.createRoot(rootElement);
+            root.render(React.createElement(App));
+        } else {
+            console.error("Root element not found");
+        }
+    </script>
+</body>
+</html>
